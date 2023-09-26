@@ -1,0 +1,14 @@
+#lang racket
+
+(define lista-bots (list ))
+
+(define (system-add-chatbot name)
+  (add-bot name lista-bots)
+  )
+
+(define (add-bot name lista)  ;funcion que agrega un bot si este no existe en el sistema.
+    (if  (not(null? (filter(lambda(x)(= name x))lista)))
+      ("Nombre invalido")
+      (cons name lista)
+      )
+  )
