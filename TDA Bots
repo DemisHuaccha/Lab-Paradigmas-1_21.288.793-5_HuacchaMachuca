@@ -2,13 +2,26 @@
 
 (define lista-bots (list ))
 
+(define (get-bot lista)
+  (cdr(lista))
+  )
+(define (get-name lista)
+  (cdr(get-bot(lista)))
+  )
+(define (get-frases lista)
+  (cdr(get-name(lista)))
+  )
+
 (define (system-add-chatbot name)
-  (add-bot name lista-bots)
+  (add-bot name lista-bots lista-bots)
   )
 
 (define (add-bot name lista)  ;funcion que agrega un bot si este no existe en el sistema.
-    (if  (not(null? (filter(lambda(x)(= name x))lista)))
+    (if  (not (null? (filter(lambda(x)(= name x))lista)))
       ("Nombre invalido")
-      (cons name lista)
+      (if (list? name)
+        (cons lista-bots name)
+        (cons lista-bots '(name))
+        )
       )
   )
