@@ -25,3 +25,33 @@
         )
       )
   )
+
+----------------------------TDA user--------------------------
+
+(define system2 '( ("users") ("flows") ("historial")))
+
+(define (get-user lista)
+  (car lista)
+  )
+(define (get-flows lista)
+  (car (cdr(lista)))
+  )
+(define (get-historial lista)
+  (cdr (cdr (lista)))
+  )
+
+(define (crear-user2 nombre clave lista)
+  (if (not(null? (filter (lambda (x)(eq? (car x) nombre))  lista )))
+      "User Invalido"
+      (cons lista (list nombre clave))
+  )
+  )
+
+(define (crear-user nombre clave)
+  (crear-user2 nombre clave (cdr (get-user system2)))
+  )
+
+
+
+
+
