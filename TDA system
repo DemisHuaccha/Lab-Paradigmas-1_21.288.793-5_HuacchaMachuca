@@ -1,0 +1,29 @@
+#lang racket
+
+(define (system-on)
+  (system-main-user 0)
+  )
+
+(define (system-main-user  x)
+  
+  (display "1: registrar user")
+  (newline)
+  (display "2: login" )
+  (newline)
+  (display "3: off")
+  (newline)
+  (display "4: Registrar Bot")
+  (newline)
+  (system-option-user (read))
+
+  )
+
+(define (system-option-user x)
+    (if (= 0 x)
+      (system-main-user (read))
+      (if (= 1 x)
+          "hola";(crear-user (readline) (readline) )
+          "ok"
+          )
+      )
+  )
