@@ -1,5 +1,52 @@
 #lang racket
 
+(define (get-flow chatbot)
+  (cdr (cdr (cdr (cdr chatbot))))
+  )
+
+(define (option code message chatbot-codelink . flow-codelink)
+  (cons code (cons message (cons chatbot-codelink flow-codelink)))
+  )
+
+(define (flow id name-msg . option)
+  (if (null? option)
+      (cons id name-msg)
+      (cons id (cons name-msg option))
+      )
+ )
+
+(define (flow-add-option flow . x)
+  (cons flow x )
+  )
+
+(define (chatbot id name welcome-message starflow-id . flow)
+  (if (null? flow)
+      (cons id (cons name (cons welcome-message starflow-id)))
+      (cons id (cons name (cons welcome-message (cons starflow-id flow))))
+      )
+  )
+
+(define (add-flow chatbot-flow flow)
+  (if (null? chatbot-flow)
+      (flow)
+      (if (eq? (car (car chatbot-flow)) (car flow))
+          (and (display "ID ya utilizado")(newline)(display (car (car chatbot-flow)))(newline)(display (car flow)))
+          (cons (add-flow (cdr chatbot-flow) flow) (flow))
+          )
+      )
+  )
+
+(define (chatbot-add-flow chatbot flow)
+  (add-flow (get-flow chatbot) flow)
+  )
+
+
+
+
+
+
+
+;----------------------------------pruebas---------------------------------
 (define (system-on)
   (system-main-user 0)
   )
