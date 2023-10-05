@@ -1,8 +1,45 @@
 #lang racket
+;-------------------Funciones get--------------------------;
 
 (define (get-flow chatbot)
   (cdr (cdr (cdr (cdr chatbot))))
   )
+
+(define (get-id-chatbot chatbot)
+  (car chatbot)
+  )
+  
+(define (get-name-chatbot chatbot)
+  (car (cdr chatbot))
+  )
+  
+(define (get-WelcomeMessage-chatbot chatbot)
+  (car (cdr (cdr chatbot)))
+  )
+  
+(define (get-initial-flow-code chatbot)
+  (car (cdr (cdr (cdr chatbot))))
+  )
+(define (get-name-system system)
+  (car system)
+  )
+(define (get-initial-chatbot-code system)
+  (car (cdr system))
+  )
+(define (get-chatbot-system system)
+  (cdr (cdr system))
+  )
+(define (get-chatbot-id-system2 lista-chatbots lista)
+  (if (null? lista-chatbots)
+      (cons null lista)
+      (get-chatbot-id-system2 (cdr lista-chatbots) (cons (get-id-chatbot (car lista-chatbots)) lista))
+      )
+  )
+(define (get-chatbot-id-system lista-chatbots)
+  (get-chatbot-id-system2 lista-chatbots (list ))
+  )
+
+;------------------------------------Funciones construcoras y modificadoras------------------------------------------;
 
 (define (option code message chatbot-codelink . flow-codelink)
   (cons code (cons message (cons chatbot-codelink flow-codelink)))
@@ -37,12 +74,25 @@
   )
 
 (define (chatbot-add-flow chatbot flow)
-  (add-flow (get-flow chatbot) flow)
+  (cons (get-id-chatbot chatbot) (cons (get-name-chatbot chatbot) (cons (get-WelcomeMessage-chatbot chatbot) (cons (get-initial-flow-code chatbot) (add-flow (get-flow chatbot) flow)))))
   )
 
+(define (system name initial-Chatbot-code-link . chatbot)
+  (if (null? chatbot)
+      (cons name initial-Chatbot-code-link)
+      (cons name (cons initial-Chatbot-code-link chatbot))
+      )
+  )
 
-
-
+(define (system-add-chatbot system chatbot)
+  (if (null? (get-chatbot-system system))
+      (cons (get-name-system) (cons get-initial-chatbot-code system (cons (get-chatbot-system system) chatbot)))
+      (if (not (null? (filter (lambda(x)(eq? x (get-id-chatbot chatbot))) ( get-chatbot-id-system (get-chatbot-system system)) )))
+          (and (newline) (display "Error : Chatbot duplicado")(newline)(display "Intentolo de nuevo"))
+          (cons (get-name-system system)(cons (get-initial-chatbot-code system) (cons (get-chatbot-system system) chatbot)))
+          )
+      )
+  )
 
 
 
