@@ -1,5 +1,21 @@
 #lang racket
+;(require "TDA user scheme.rkt")
+
 ;-------------------Funciones get--------------------------;
+
+(define (get-id-option option)
+  (car option)
+  )
+
+(define (get-option-flow flow)
+  (cdr (cdr flow))
+  )
+(define (get-id-flow flow)
+  (car flow)
+  )
+(define (get-name-msg-flow flow)
+  (car (cdr flow))
+  )
 
 (define (get-flow chatbot)
   (cdr (cdr (cdr (cdr chatbot))))
@@ -39,48 +55,158 @@
   (get-chatbot-id-system2 lista-chatbots (list ))
   )
 
+(define (get-system-users system)
+  (if (string? (cdr system))
+      (cons (cdr system) null)
+      (if (number? (car (cdr system)))
+          (cons null null)
+          (cdr system)
+          )
+      )
+  )
+
+;--------------Funcion modificadora de lista user en el systema-------------------;
+
+(define (convinar-user lista user)
+  (if (null? lista)
+      (cons user null)
+      (if (null? (cdr lista))
+          (cons (car lista) user)
+          (cons (car lista)(convinar-user (cdr lista) user))
+          )
+      )
+  )
+
+(define (convinar-id lista id)
+  (if (null? lista)
+      (cons id lista)
+      (cons (car lista) (convinar-id (cdr lista) id))
+      )
+  )
+
 ;------------------------------------Funciones construcoras y modificadoras------------------------------------------;
 
-(define (option code message chatbot-codelink . flow-codelink)
-  (cons code (cons message (cons chatbot-codelink flow-codelink)))
+;Funcion Option;
+
+(define (option code message chatbot-codelink flow-codelink . keyword)
+  (if (null? keyword)
+      (cons code (cons message (cons chatbot-codelink flow-codelink)))
+      (cons code (cons message (cons chatbot-codelink (cons flow-codelink keyword))))
+      )
+  )
+
+;Funciones Flow;
+
+(define (verificar-option option lista-id)
+  (if (null? option)
+      (list )
+      (if (null? (filter (lambda (x)(eq? x (get-id-option option))) lista-id ))
+          (cons (car option) (verificar-option (cdr option) (convinar-id lista-id (get-id-option option))))
+          (verificar-option (cdr option) lista-id)
+          )
+      )
+  )
+(define (unir-option option lista)
+  (if (null? lista)
+      (cons option null)
+      (cons (car lista) (unir-option option (cdr lista)))
+      )
   )
 
 (define (flow id name-msg . option)
   (if (null? option)
       (cons id name-msg)
-      (cons id (cons name-msg option))
+      (cons id (cons name-msg (verificar-option option (list ))))
       )
  )
 
-(define (flow-add-option flow . x)
-  (cons flow x )
+(define (get-id-option-flow flow-options)
+  (if (null? flow-options)
+      (list )
+      (cons (get-id-option (car flow-options)) (get-id-option-flow (cdr flow-options)) )
+      )
+  )
+
+(define (flow-add-option flow op)
+  (if (null? (filter (lambda (x) (= x (get-id-option op))) (get-id-option-flow (get-option-flow flow))))
+      (cons (get-id-flow flow) (cons (get-name-msg-flow flow) (unir-option op (get-option-flow flow))))
+      (display "Opcion repetida")
+      )
+  )
+
+;Funciones Chatbot;
+
+(define (get-flow-chatbot bot)
+  (cdr (cdr (cdr (cdr bot))))
+  )
+
+(define (get-id-flows-chatbot chatbot)
+  (if (null? chatbot)
+      (list )
+      (cons (get-id-flow (car chatbot)) (get-id-flows-chatbot (cdr chatbot)))
+      )
+  )
+(define (verificar-flows flow)
+  (if (number? (car flow))
+      (cons flow null)
+      (cons (car flow) (verificar-flows2 flow (list (get-id-flow (car flow)))))
+      )
+  )
+
+(define (verificar-flows2 flow lista)
+  (if (null? flow)
+      (list )
+      (if (null? (filter (lambda (x) (eq? (get-id-flow (car flow)) x) ) lista ))
+          (cons (car flow) (verificar-flows2 (cdr flow) (cons lista (get-id-flow (car flow)))))
+          (verificar-flows2 (cdr flow) lista)
+          )
+      )
   )
 
 (define (chatbot id name welcome-message starflow-id . flow)
   (if (null? flow)
       (cons id (cons name (cons welcome-message starflow-id)))
-      (cons id (cons name (cons welcome-message (cons starflow-id flow))))
+      (cons id (cons name (cons welcome-message (cons starflow-id (verificar-flows flow)))))
       )
   )
 
 (define (add-flow chatbot-flow flow)
   (if (null? chatbot-flow)
-      (flow)
+      (cons flow null)
       (if (eq? (car (car chatbot-flow)) (car flow))
           (and (display "ID ya utilizado")(newline)(display (car (car chatbot-flow)))(newline)(display (car flow)))
-          (cons (add-flow (cdr chatbot-flow) flow) (flow))
+          (cons (car chatbot-flow) (add-flow (cdr chatbot-flow) flow))
           )
       )
   )
-
 (define (chatbot-add-flow chatbot flow)
   (cons (get-id-chatbot chatbot) (cons (get-name-chatbot chatbot) (cons (get-WelcomeMessage-chatbot chatbot) (cons (get-initial-flow-code chatbot) (add-flow (get-flow chatbot) flow)))))
+  )
+
+;Funciones system ;
+
+
+
+(define (verificar-bot chatbot)
+  (if (number? (car chatbot))
+      (cons chatbot null)
+      (cons (car chatbot)(verificar-bot2 (cdr chatbot) (list (car (car chatbot)))))
+      )
+  )
+(define (verificar-bot2 chatbot lista)
+  (if (null? chatbot)
+      (list )
+      (if (null? (filter (lambda (x)(eq? (car (car chatbot)) x)) lista))
+          (cons (car chatbot) (verificar-bot2 (cdr chatbot) (cons lista (car (car chatbot) ) )))
+          (verificar-bot2 (cdr chatbot) lista )
+          )
+      )
   )
 
 (define (system name initial-Chatbot-code-link . chatbot)
   (if (null? chatbot)
       (cons name initial-Chatbot-code-link)
-      (cons name (cons initial-Chatbot-code-link chatbot))
+      (cons name (cons initial-Chatbot-code-link (verificar-bot chatbot)))
       )
   )
 
@@ -88,39 +214,32 @@
   (if (null? (get-chatbot-system system))
       (cons (get-name-system) (cons get-initial-chatbot-code system (cons (get-chatbot-system system) chatbot)))
       (if (not (null? (filter (lambda(x)(eq? x (get-id-chatbot chatbot))) ( get-chatbot-id-system (get-chatbot-system system)) )))
-          (and (newline) (display "Error : Chatbot duplicado")(newline)(display "Intentolo de nuevo"))
+          (and (newline) (display "Error : Chatbot ")(display (car chatbot))(display " duplicado")(newline)(display "Intentolo de nuevo"))
           (cons (get-name-system system)(cons (get-initial-chatbot-code system) (cons (get-chatbot-system system) chatbot)))
           )
       )
   )
 
-
-
-;----------------------------------pruebas---------------------------------
-(define (system-on)
-  (system-main-user 0)
-  )
-
-(define (system-main-user  x)
-  
-  (display "1: registrar user")
-  (newline)
-  (display "2: login" )
-  (newline)
-  (display "3: off")
-  (newline)
-  (display "4: Registrar Bot")
-  (newline)
-  (system-option-user (read))
-
-  )
-
-(define (system-option-user x)
-    (if (= 0 x)
-      (system-main-user (read))
-      (if (= 1 x)
-          "hola";(crear-user (readline) (readline) )
-          "ok"
+(define (system-add-user system user)
+  (if (string? (cdr system))
+      (if (null? (filter (lambda(x)(eq? user x))(get-system-users system)))
+          (cons (car system) (convinar-user (get-system-users system) user))
+          (display "User ya utilizado")
           )
+      (cons system user)
       )
   )
+
+;(define (system-login system
+
+
+;--------------------------TEST-----------------------------;
+
+(define op1 (option  1 "1) Viajar" 1 1 "viajar" "turistear" "conocer"))
+(define op2 (option  2 "2) Estudiar" 2 1 "estudiar" "aprender" "perfeccionarme"))
+(define op3 (option  3 "2) Estudiar" 2 1 "estudiar" "aprender" "perfeccionarme"))
+(define f10 (flow 1 "Flujo Principal Chatbot 1\nBienvenido\n¿Qué te gustaría hacer?" op1 op2 op2 op2 op1)) ;solo añade una ocurrencia de op2 y op1
+(define f11 (flow-add-option f10 op3)) ;se intenta añadir opción duplicada            
+(define cb0 (chatbot 0 "Inicial" "Bienvenido\n¿Qué te gustaría hacer?" 1 f10 f10 f10 f10))  ;solo añade una ocurrencia de f10
+(define s0 (system "Chatbots Paradigmas" 0 cb0 cb0 cb0))
+(define s1 (system-add-chatbot s0 cb0)) ;igual a s0
