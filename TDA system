@@ -55,16 +55,6 @@
   (get-chatbot-id-system2 lista-chatbots (list ))
   )
 
-(define (get-system-users system)
-  (if (string? (cdr system))
-      (cons (cdr system) null)
-      (if (number? (car (cdr system)))
-          (cons null null)
-          (cdr system)
-          )
-      )
-  )
-
 ;--------------Funcion modificadora de lista user en el systema-------------------;
 
 (define (convinar-user lista user)
@@ -76,6 +66,13 @@
           )
       )
   )
+(define (convinar-user2 lista user)
+  (if (null? lista)
+      (cons user null)
+      (cons (car lista)(convinar-user2 (cdr lista) user))
+      )
+  )
+
 
 (define (convinar-id lista id)
   (if (null? lista)
@@ -157,7 +154,7 @@
   (if (null? flow)
       (list )
       (if (null? (filter (lambda (x) (eq? (get-id-flow (car flow)) x) ) lista ))
-          (cons (car flow) (verificar-flows2 (cdr flow) (cons lista (get-id-flow (car flow)))))
+          (cons (car flow) (verificar-flows2 (cdr flow) (convinar-id lista (get-id-flow (car flow)))))
           (verificar-flows2 (cdr flow) lista)
           )
       )
@@ -214,23 +211,45 @@
   (if (null? (get-chatbot-system system))
       (cons (get-name-system) (cons get-initial-chatbot-code system (cons (get-chatbot-system system) chatbot)))
       (if (not (null? (filter (lambda(x)(eq? x (get-id-chatbot chatbot))) ( get-chatbot-id-system (get-chatbot-system system)) )))
-          (and (newline) (display "Error : Chatbot ")(display (car chatbot))(display " duplicado")(newline)(display "Intentolo de nuevo"))
+          (and (newline) (display "Error : Chatbot ") (display (car chatbot)) (display " duplicado") (newline) (display "Intentolo de nuevo")(cons (car system) (cdr system)))
           (cons (get-name-system system)(cons (get-initial-chatbot-code system) (cons (get-chatbot-system system) chatbot)))
           )
       )
   )
 
+;-------------------------System - User------------------------------------;
+(define (get-system-users system)
+  (list (cdr system))
+  )
+
+
 (define (system-add-user system user)
-  (if (string? (cdr system))
-      (if (null? (filter (lambda(x)(eq? user x))(get-system-users system)))
-          (cons (car system) (convinar-user (get-system-users system) user))
-          (display "User ya utilizado")
+      (if (number? (car (cdr system)))
+          (cons system (list user))
+          (if (string? (car (cdr system)))
+              (if (null? (filter (lambda (x)(eq? x user)) (cdr system)))
+                  (cons (car system) (convinar-user2 (cdr system) user))
+                  (cons (car system) (cdr system))
+                  )
+              (list )
           )
-      (cons system user)
       )
   )
 
-;(define (system-login system
+
+(define (system-login system user)
+      (if (string? (cdr system))
+          (and (display "Ya hay una sesion abierta") (cons (car system) (cdr system) ))
+          (if (number?  (car (cdr system)))
+              (and (display "No hay users registrados")(cons (car system)(cdr system)))
+              (if (null? (filter (lambda (x)(eq? x user)) (cdr system)))
+                  (and (display "User Invalido") (cons (car system) (cdr system)))
+                  (cons system user)
+                  )
+          )
+      )
+  )
+
 
 
 ;--------------------------TEST-----------------------------;
@@ -243,3 +262,10 @@
 (define cb0 (chatbot 0 "Inicial" "Bienvenido\n¿Qué te gustaría hacer?" 1 f10 f10 f10 f10))  ;solo añade una ocurrencia de f10
 (define s0 (system "Chatbots Paradigmas" 0 cb0 cb0 cb0))
 (define s1 (system-add-chatbot s0 cb0)) ;igual a s0
+(define s2 (system-add-user s1 "user1"))
+(define s3 (system-add-user s2 "user2"))
+(define s4 (system-add-user s3 "user2")) ;solo añade un ocurrencia de user2
+(define s5 (system-add-user s4 "user3"))
+(define s6 (system-login s5 "user8")) ;user8 no existe. No inicia sesión
+(define s7 (system-login s6 "user1"))
+(define s8 (system-login s7 "user2"))  ;no permite iniciar sesión a user2, pues user1 ya inició sesión
