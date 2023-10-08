@@ -250,6 +250,48 @@
       )
   )
 
+(define (system-logout system)
+      (if (string? (cdr system))
+          (car system)
+          (and (display "No hay sesion abierta") (cons (car system) (cdr system)) )
+          )
+  )
+
+;-----------------------System Talk---------------------------;
+
+(define (system-talk-rec system message) ;system-talk hecho para ser el primero en ser llamado verificar que es un systema con usuarios registrados y transferir el llamado a system-talk-2
+  (if (not (string? (cdr system) ))
+      (void)
+      (and (display (car (car system)))(newline)(display (car (cdr (cdr (car (cdr (cdr (car s2))))))))(newline)(system-talk-rec2 (car system) (message) ))
+      )
+  )
+
+(define (obt-lista-id-bot bots lista)
+  (if (null? bots)
+      (cons (car lista) (cdr lista))
+      (if (null? lista)
+          (obt-lista-id-bot (cdr bots) (cons (car (car bots)) null))
+          (obt-lista-id-bot (cdr bots) (cons (car lista) (cons (cdr lista) (car (car bots)))))
+          )
+      )
+  )
+(define (obt-bot-system bots id)
+  (if (null? bots)
+      (null)
+      (if (eq? (car (car bots)) id)
+          (car bots)
+          (obt-bot-system (cdr bots) id)
+          )
+      )
+  )
+
+(define (system-talk-rec2 system message)
+  (if (null? (filter (lambda (x) (eq? x message))(obt-lista-id-bot (cdr (cdr system)) (list ))))
+      (display "Error")
+      ( (obt-bot-system (cdr (cdr system)) (car (cdr system))))
+      )
+  )
+
 
 
 ;--------------------------TEST-----------------------------;
