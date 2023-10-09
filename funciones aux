@@ -1,0 +1,217 @@
+#lang racket
+
+
+;-------------------Funciones get--------------------------;
+(provide get-id-option)
+
+(define (get-id-option option)
+  (car option)
+  )
+(provide get-option-flow)
+
+(define (get-option-flow flow)
+  (cdr (cdr flow))
+  )
+
+(provide get-id-flow)
+
+(define (get-id-flow flow)
+  (car flow)
+  )
+
+(provide get-name-msg-flow)
+ 
+(define (get-name-msg-flow flow)
+  (car (cdr flow))
+  )
+
+(provide get-flow)
+
+(define (get-flow chatbot)
+  (cdr (cdr (cdr (cdr chatbot))))
+  )
+
+(provide get-id-chatbot)
+
+(define (get-id-chatbot chatbot)
+  (car chatbot)
+  )
+
+(provide get-name-chatbot)
+
+(define (get-name-chatbot chatbot)
+  (car (cdr chatbot))
+  )
+
+(provide get-WelcomeMessage-chatbot)
+
+(define (get-WelcomeMessage-chatbot chatbot)
+  (car (cdr (cdr chatbot)))
+  )
+
+(provide get-initial-flow-code)
+
+(define (get-initial-flow-code chatbot)
+  (car (cdr (cdr (cdr chatbot))))
+  )
+
+(provide get-name-system)
+
+(define (get-name-system system)
+  (car system)
+  )
+(provide get-initial-chatbot-code)
+
+(define (get-initial-chatbot-code system)
+  (car (cdr system))
+  )
+
+(provide get-chatbot-system)
+
+(define (get-chatbot-system system)
+  (cdr (cdr system))
+  )
+
+(provide get-chatbot-id-system2)
+
+(define (get-chatbot-id-system2 lista-chatbots lista)
+  (if (null? lista-chatbots)
+      (cons null lista)
+      (get-chatbot-id-system2 (cdr lista-chatbots) (cons (get-id-chatbot (car lista-chatbots)) lista))
+      )
+  )
+
+(provide get-chatbot-id-system)
+
+(define (get-chatbot-id-system lista-chatbots)
+  (get-chatbot-id-system2 lista-chatbots (list ))
+  )
+
+;------------Funciones Aux--------------------;
+
+(provide verificar-option)
+
+(define (verificar-option option lista-id)
+  (if (null? option)
+      (list )
+      (if (null? (filter (lambda (x)(eq? x (get-id-option option))) lista-id ))
+          (cons (car option) (verificar-option (cdr option) (convinar-id lista-id (get-id-option option))))
+          (verificar-option (cdr option) lista-id)
+          )
+      )
+  )
+
+(provide unir-option)
+
+(define (unir-option option lista)
+  (if (null? lista)
+      (cons option null)
+      (cons (car lista) (unir-option option (cdr lista)))
+      )
+  )
+
+
+;--------------Funcion modificadora de lista user en el systema-------------------;
+
+(provide convinar-user)
+
+(define (convinar-user lista user)
+  (if (null? lista)
+      (cons user null)
+      (if (null? (cdr lista))
+          (cons (car lista) user)
+          (cons (car lista)(convinar-user (cdr lista) user))
+          )
+      )
+  )
+
+(provide convinar-user2)
+
+(define (convinar-user2 lista user)
+  (if (null? lista)
+      (cons user null)
+      (cons (car lista)(convinar-user2 (cdr lista) user))
+      )
+  )
+
+(provide convinar-id)
+
+(define (convinar-id lista id)
+  (if (null? lista)
+      (cons id lista)
+      (cons (car lista) (convinar-id (cdr lista) id))
+      )
+  )
+
+;Funciones Flow;
+
+(provide get-id-option-flow)
+
+(define (get-id-option-flow flow-options)
+  (if (null? flow-options)
+      (list )
+      (cons (get-id-option (car flow-options)) (get-id-option-flow (cdr flow-options)) )
+      )
+  )
+
+;Funciones Chatbot;
+
+(provide get-flow-chatbot )
+
+(define (get-flow-chatbot bot)
+  (cdr (cdr (cdr (cdr bot))))
+  )
+
+(provide get-id-flows-chatbot)
+
+(define (get-id-flows-chatbot chatbot)
+  (if (null? chatbot)
+      (list )
+      (cons (get-id-flow (car chatbot)) (get-id-flows-chatbot (cdr chatbot)))
+      )
+  )
+
+(provide verificar-flows)
+
+(define (verificar-flows flow)
+  (if (number? (car flow))
+      (cons flow null)
+      (cons (car flow) (verificar-flows2 flow (list (get-id-flow (car flow)))))
+      )
+  )
+
+(provide verificar-flows2)
+
+(define (verificar-flows2 flow lista)
+  (if (null? flow)
+      (list )
+      (if (null? (filter (lambda (x) (eq? (get-id-flow (car flow)) x) ) lista ))
+          (cons (car flow) (verificar-flows2 (cdr flow) (convinar-id lista (get-id-flow (car flow)))))
+          (verificar-flows2 (cdr flow) lista)
+          )
+      )
+  )
+
+;Funciones system ;
+
+(provide verificar-bot)
+
+(define (verificar-bot chatbot)
+  (if (number? (car chatbot))
+      (cons chatbot null)
+      (cons (car chatbot)(verificar-bot2 (cdr chatbot) (list (car (car chatbot)))))
+      )
+  )
+
+(provide verificar-bot2)
+
+(define (verificar-bot2 chatbot lista)
+  (if (null? chatbot)
+      (list )
+      (if (null? (filter (lambda (x)(eq? (car (car chatbot)) x)) lista))
+          (cons (car chatbot) (verificar-bot2 (cdr chatbot) (cons lista (car (car chatbot) ) )))
+          (verificar-bot2 (cdr chatbot) lista )
+          )
+      )
+  )
+
