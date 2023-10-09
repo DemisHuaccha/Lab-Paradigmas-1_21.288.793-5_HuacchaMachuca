@@ -209,7 +209,7 @@
   (if (null? chatbot)
       (list )
       (if (null? (filter (lambda (x)(eq? (car (car chatbot)) x)) lista))
-          (cons (car chatbot) (verificar-bot2 (cdr chatbot) (cons lista (car (car chatbot) ) )))
+          (cons (car chatbot) (verificar-bot2 (cdr chatbot) (cons (car (car chatbot) ) lista )))
           (verificar-bot2 (cdr chatbot) lista )
           )
       )
