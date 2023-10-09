@@ -1,8 +1,8 @@
 #lang racket
 
-(require "funciones-aux.rkt")
+(require "funciones-aux_21288793-5_HuacchaMachuca.rkt")
 
-(require "tda-option.rkt")
+(require "tda-option_21288793-5_HuacchaMachuca.rkt")
 
 ;Funciones Flow;
 
