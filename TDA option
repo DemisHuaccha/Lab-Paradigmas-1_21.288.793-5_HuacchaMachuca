@@ -1,0 +1,12 @@
+(require "funciones-aux.rkt")
+
+;Funcion Option;
+
+(provide option)
+
+(define (option code message chatbot-codelink flow-codelink . keyword)     ; Estructura base Option
+  (if (null? keyword)
+      (cons code (cons message (cons chatbot-codelink flow-codelink)))
+      (cons code (cons message (cons chatbot-codelink (cons flow-codelink keyword))))
+      )
+  )
