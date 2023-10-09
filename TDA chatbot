@@ -1,0 +1,34 @@
+#lang racket
+
+(require "funciones-aux.rkt")
+(require "tda-option.rkt")
+(require "tda-flow.rkt")
+
+;Funciones Chatbot;
+
+(provide chatbot)
+
+(define (chatbot id name welcome-message starflow-id . flow)    ;Estructura base Chatbot
+  (if (null? flow)
+      (cons id (cons name (cons welcome-message starflow-id)))
+      (cons id (cons name (cons welcome-message (cons starflow-id (verificar-flows flow)))))
+      )
+  )
+
+(provide add-flow)
+
+(define (add-flow chatbot-flow flow)
+  (if (null? chatbot-flow)
+      (cons flow null)
+      (if (eq? (car (car chatbot-flow)) (car flow))
+          (cons (car chatbot-flow) (cdr chatbot-flow))
+          (cons (car chatbot-flow) (add-flow (cdr chatbot-flow) flow))
+          )
+      )
+  )
+
+(provide chatbot-add-flow)
+
+(define (chatbot-add-flow chatbot flow)
+  (cons (get-id-chatbot chatbot) (cons (get-name-chatbot chatbot) (cons (get-WelcomeMessage-chatbot chatbot) (cons (get-initial-flow-code chatbot) (add-flow (get-flow chatbot) flow)))))
+  )
