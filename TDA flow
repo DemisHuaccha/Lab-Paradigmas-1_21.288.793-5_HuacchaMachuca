@@ -1,0 +1,25 @@
+#lang racket
+
+(require "funciones-aux.rkt")
+
+(require "tda-option.rkt")
+
+;Funciones Flow;
+
+(provide flow)
+
+(define (flow id name-msg . option)     ; Estructura base flow
+  (if (null? option)
+      (cons id name-msg)
+      (cons id (cons name-msg (verificar-option option (list ))))
+      )
+ )
+
+(provide flow-add-option)
+
+(define (flow-add-option flow op)
+  (if (null? (filter (lambda (x) (= x (get-id-option op))) (get-id-option-flow (get-option-flow flow))))
+      (cons (get-id-flow flow) (cons (get-name-msg-flow flow) (unir-option op (get-option-flow flow))))
+      (cons (car flow) (cdr flow))
+      )
+  )
