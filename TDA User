@@ -2,27 +2,24 @@
 
 ----------------------------TDA user--------------------------
 
-; user -> Dominio: name (string) , key (string-entero) , historial personal (lista)
+; user -> Dominio: name (string), historial personal (lista)
 ;
-; historial personal se obtinene cuanto se deslogea el usuario
+; historial personal se actualiza en cada llamada mientras este logueado el usuario
 ; (user '("lista de users"))
 
 (define (get-user-name lista)
   (car lista)
 )
 
-(define (get-user-key lista)
-  (car (cdr lista))
-)
 
 (define (get-user-historial lista)
-  (cdr (cdr lista))
+ (cdr lista)
 )
 
-(define (user nombre clave . historial)
+(define (user nombre . historial)
     (if (null? historial)
-      (cons nombre clave)
-      (cons nombre (cons clave historial))
+      (cons nombre null)
+      (cons nombre  historial)
   )
 )
 
