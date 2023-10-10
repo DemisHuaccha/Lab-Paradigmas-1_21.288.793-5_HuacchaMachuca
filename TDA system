@@ -71,7 +71,7 @@
 (define (system-talk-rec system message) ;system-talk hecho para ser el primero en ser llamado verificar que es un systema con usuarios registrados y transferir el llamado a system-talk-2
   (if (not (string? (cdr system) ))
       (void)
-      (and (display (car (car system)))(newline)(display (car (cdr (cdr (car (cdr (cdr (car s2))))))))(newline)(system-talk-rec2 (car system) (message) ))
+      (and (display (car (car system)))(newline)(display (car (cdr (cdr (car (cdr (cdr (car system))))))))(newline)(system-talk-rec2 (car system) (message) ))
       )
   )
 
